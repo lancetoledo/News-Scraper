@@ -7,6 +7,7 @@ var logger = require("morgan");
 var axios = require("axios");
 var cheerio = require("cheerio");
 
+var db = require("./models");
 
 
 // Initialize Express
@@ -20,16 +21,6 @@ app.use(express.static("public"));
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
-// Database configuration
-// var databaseUrl = "scraper";
-// var collections = ["scrapedData"];
-
-// Hook mongojs configuration to the db variable
-// var db = mongojs(databaseUrl, collections);
-// db.on("error", function(error) {
-//   console.log("Database Error:", error);
-// });
-
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/News-Scraper";
 console.log("connection: "+MONGODB_URI)
 
@@ -38,23 +29,28 @@ mongoose.connect(MONGODB_URI, {useNewUrlParser: true});
 
 // Main route (simple Hello World Message)
 app.get("/", function(req, res) {
-  res.render("index");
+  db.Article.find({
+    summary: {
+        $exists: true
+    }
+}).limit(20)
+    .then(function (dbArticles) {
+        let scraped = false
+        if (dbArticles.length > 0){
+            scraped = true
+        }
+        res.render("index", {
+            articles: dbArticles,
+            scraped: scraped
+        })
+    })
+    .catch(function (err) {
+        res.json(err);
+    });
 });
 
-// Retrieve data from the db
-app.get("/all", function(req, res) {
-  // Find all results from the scrapedData collection in the db
-  db.scrapedData.find({}, function(error, found) {
-    // Throw any errors to the console
-    if (error) {
-      console.log(error);
-    }
-    // If there are no errors, send the data to the browser as json
-    else {
-      res.json(found);
-    }
-  });
-});
+
+
 
 // Scrape data from one site and place it into the mongodb db
 app.get("/scrape", function (req, res) {
@@ -76,6 +72,39 @@ app.get("/scrape", function (req, res) {
       res.send("Scrape Complete")
   });
 });
+
+app.get("/articles/:id", function (req, res) {
+  db.Article.findOne({
+          _id: req.params.id
+      })
+      .populate("note")
+      .then(function (dbArticle) {
+          res.json(dbArticle)
+      })
+      .catch(function (err) {
+          res.json(err);
+      });
+});
+
+app.post("/articles/:id", function (req, res) {
+  db.Note.create(req.body)
+      .then(function (dbNote) {
+          return db.Article.findOneAndUpdate({
+              _id: req.params.id
+          }, {
+              note: dbNote._id
+          }, {
+              new: true
+          });
+      })
+      .then(function (dbArticle) {
+          res.json(dbArticle);
+      })
+      .catch(function (err) {
+          res.json(err);
+      });
+});
+
 
 var PORT = process.env.PORT || 3000;
 // Listen on port 3000
