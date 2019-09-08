@@ -1,7 +1,8 @@
 // Dependencies
 var express = require("express");
-var mongojs = require("mongojs");
+var exphbs = require("express-handlebars");
 var mongoose = require("mongoose");
+var logger = require("morgan");
 // Require axios and cheerio. This makes the scraping possible
 var axios = require("axios");
 var cheerio = require("cheerio");
@@ -10,6 +11,14 @@ var cheerio = require("cheerio");
 
 // Initialize Express
 var app = express();
+
+app.use(logger("dev"));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.static("public"));
+
+app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
 
 // Database configuration
 // var databaseUrl = "scraper";
@@ -29,7 +38,7 @@ mongoose.connect(MONGODB_URI, {useNewUrlParser: true});
 
 // Main route (simple Hello World Message)
 app.get("/", function(req, res) {
-  res.send("Hello world");
+  res.render("index");
 });
 
 // Retrieve data from the db
