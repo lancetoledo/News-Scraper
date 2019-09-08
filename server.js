@@ -1,6 +1,7 @@
 // Dependencies
 var express = require("express");
 var mongojs = require("mongojs");
+var mongoose = require("mongoose");
 // Require axios and cheerio. This makes the scraping possible
 var axios = require("axios");
 var cheerio = require("cheerio");
@@ -11,14 +12,20 @@ var cheerio = require("cheerio");
 var app = express();
 
 // Database configuration
-var databaseUrl = "scraper";
-var collections = ["scrapedData"];
+// var databaseUrl = "scraper";
+// var collections = ["scrapedData"];
 
 // Hook mongojs configuration to the db variable
-var db = mongojs(databaseUrl, collections);
-db.on("error", function(error) {
-  console.log("Database Error:", error);
-});
+// var db = mongojs(databaseUrl, collections);
+// db.on("error", function(error) {
+//   console.log("Database Error:", error);
+// });
+
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/News-Scraper";
+console.log("connection: "+MONGODB_URI)
+
+mongoose.connect(MONGODB_URI, {useNewUrlParser: true});
+
 
 // Main route (simple Hello World Message)
 app.get("/", function(req, res) {
