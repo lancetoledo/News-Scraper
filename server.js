@@ -5,6 +5,8 @@ var mongojs = require("mongojs");
 var axios = require("axios");
 var cheerio = require("cheerio");
 
+
+
 // Initialize Express
 var app = express();
 
@@ -39,44 +41,28 @@ app.get("/all", function(req, res) {
 });
 
 // Scrape data from one site and place it into the mongodb db
-app.get("/scrape", function(req, res) {
-  // Make a request via axios for the news section of `ycombinator`
-  axios.get("https://news.ycombinator.com/").then(function(response) {
-    // Load the html body from axios into cheerio
-    var $ = cheerio.load(response.data);
-    // For each element with a "title" class
-    $(".title").each(function(i, element) {
-      // Save the text and href of each link enclosed in the current element
-      var title = $(element).children("a").text();
-      var link = $(element).children("a").attr("href");
+app.get("/scrape", function (req, res) {
+  let target = "http://www.nytimes.com"
+  axios.get(target).then(function (response) {
+      var $ = cheerio.load(response.data);
 
-      // If this found element had both a title and a link
-      if (title && link) {
-        // Insert the data in the scrapedData db
-        db.scrapedData.insert({
-          title: title,
-          link: link
-        },
-        function(err, inserted) {
-          if (err) {
-            // Log the error if one is encountered during the query
-            console.log(err);
-          }
-          else {
-            // Otherwise, log the inserted data
-            console.log(inserted);
-          }
-        });
-      }
-    });
+      let test = []
+      $("article").each(function (i, element) {
+          let result = {}
+          result.title = $(this).find("h2")['0']['children'][0]['data'];
+          result.link = target+$(this).find("a")['0'].attribs.href;
+          result.summary = $(this).find("p").text() //|| $(this).find("li").text();
+          
+          test.push(result)
+
+      });
+      console.log(test)
+      res.send("Scrape Complete")
   });
-
-  // Send a "Scrape Complete" message to the browser
-  res.send("Scrape Complete");
 });
 
-
+var PORT = process.env.PORT || 3000;
 // Listen on port 3000
-app.listen(3000, function() {
-  console.log("App running on port 3000!");
+app.listen(PORT, function () {
+  console.log("App running on http://localhost:" + PORT);
 });
