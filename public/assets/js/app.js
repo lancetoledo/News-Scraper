@@ -75,9 +75,10 @@ $(document).ready(function(){
 
      }).then(function(note){
        console.log(note);
-       $("#text-area").html(note);
-      var btn = `<button type="button" class="btn btn-primary" id="saveChange" data-id="${thisId}" data-dismiss="modal">Save changes</button>`
-      $("#noteButton").html(btn);
+       var btn = `<button type="button" class="btn btn-primary" id="saveChange" data-id="${thisId}" data-dismiss="modal">Save changes</button>`
+       $("#noteButton").html(btn);
+      //  $("#text-area").val(note);
+
      })
 
 
