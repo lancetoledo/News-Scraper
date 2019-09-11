@@ -4,8 +4,8 @@
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous"/>
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-        <link rel="stylesheet" href="./assets/css/style.css"/>
+        {{!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/> --}}
+        {{!-- <link rel="stylesheet" href="./assets/css/style.css"/> --}}
         <title>News Scraper</title>
     </head>
     <body>
@@ -18,10 +18,10 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/saved">Saved Articles</a>
+                        <a class="nav-link" href="/articles/saved" id>Saved Articles</a>
                     </li>
                     <li class="nav-item">
-                        <button class="btn btn-danger scrape" type="button">Scrape New Articles</button>
+                        <button class="btn btn-danger" id="scrape"  type="button">Scrape New Articles</button>
                     </li>
                 </ul>
             </div>

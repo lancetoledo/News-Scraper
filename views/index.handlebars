@@ -1,20 +1,26 @@
-<div class="container">
-    {{#each article}}
-        <div class="card">
-            <h3 class="card-header">{{this.title}}</h3>
-            <div class="row">
-                <div class="col-lg-8 card-block">
-                    <p class="card-text">{{this.summary}}</p>
-                    <a href="http://www.nytimes.com{{this.link}}" target="_blank" class="card-link">Read more</a>
-                </div>
-                <div class="col-lg-4 align-self-end text-right">
-                    {{#if saved}}
-                        <button class="btn btn-secondary m-2 disabled">Article Saved</button>
-                    {{else}}
-                        <button class="btn btn-success m-2 btn-save" data-id="{{this._id}}">Save Article</button>
-                    {{/if}}
-                </div>
+<div class="main-content">
+    <div class="row">
+        <div class="col-md-6 new-content">
+            <h2>Top Articles</h2>
+            <br>
+            <div id="articles">
+                {{#each articles}}
+                <p>
+                    <span class="article-title" data-id="{{this._id}}"><strong>{{this.title}}</strong></span><br>
+                    {{!-- <a href="{{this.link}}" target="_blank">Read More</a> --}}
+                    <span class="article-summary">{{this.summary}}</span>
+                    <a href="{{this.link}}" target="_blank">READ MORE</a>
+                    <button class="save" data-id="{{this._id}}">SAVE</button>
+                    {{!-- <div class="box"><iframe src="{{this.link}}" width="100%" height="500px"></iframe></div> --}}
+                    
+
+                </p>
+                {{/each}}
             </div>
         </div>
-    {{/each}}
+        <div class="col-md-2"></div>
+        
+    </div>
+
+
 </div>

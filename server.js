@@ -30,10 +30,8 @@ mongoose.connect(MONGODB_URI, {useNewUrlParser: true});
 // Main route (simple Hello World Message)
 app.get("/", function(req, res) {
   db.Article.find({
-    summary: {
-        $exists: true
-    }
-}).limit(20)
+    saved:false
+}).limit(10)
     .then(function (dbArticles) {
         let scraped = false
         if (dbArticles.length > 0){
@@ -61,49 +59,84 @@ app.get("/scrape", function (req, res) {
       let test = []
       $("article").each(function (i, element) {
           let result = {}
-          result.title = $(this).find("h2")['0']['children'][0]['data'];
+          let title = $(this).find("h2")['0']['children'][0]['data'];
+          if(title){
+           result.title = title;
+          }
+          else{
+              result.title = "NA";
+          }
           result.link = target+$(this).find("a")['0'].attribs.href;
           result.summary = $(this).find("p").text() //|| $(this).find("li").text();
-          
-          test.push(result)
-
-      });
+          db.Article.create(result)
+          .then(function(article){
+              console.log(article)
+          })
+      })
       console.log(test)
+
       res.send("Scrape Complete")
   });
 });
 
-app.get("/articles/:id", function (req, res) {
-  db.Article.findOne({
-          _id: req.params.id
-      })
-      .populate("note")
-      .then(function (dbArticle) {
-          res.json(dbArticle)
-      })
-      .catch(function (err) {
-          res.json(err);
-      });
-});
-
-app.post("/articles/:id", function (req, res) {
-  db.Note.create(req.body)
-      .then(function (dbNote) {
-          return db.Article.findOneAndUpdate({
-              _id: req.params.id
-          }, {
-              note: dbNote._id
-          }, {
-              new: true
+app.get("/articles/saved", function (req,res){
+console.log("this route was hit");
+  db.Article.find({saved:true})
+      .then(function(articles){
+          console.log(articles);
+          res.render("saved", {
+              article: articles
           });
       })
-      .then(function (dbArticle) {
-          res.json(dbArticle);
-      })
-      .catch(function (err) {
-          res.json(err);
-      });
+  
+})
+  
+app.post("/articles/saved/:id", function (req, res) {
+     console.log(req.params.id)
+     db.Article.findOneAndUpdate({
+         _id: req.params.id
+     },{saved:true}).then(function(note){
+      console.log(note);
+      res.json({})
+     })
 });
+
+
+
+
+
+
+
+
+app.post("/notes/:id", function (req, res) {
+    console.log(req.body);
+    console.log(req.params);
+
+    db.Note.create(req.body)
+    .then(function(dbNote) {
+      // If a Note was created successfully, find one User (there's only one) and push the new Note's _id to the User's `notes` array
+      // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
+      // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
+      return db.Article.findOneAndUpdate({_id:req.params.id}, { $push: { note: dbNote._id } }, { new: true });
+    })
+    .then(function(dbUser) {
+      // If the User was updated successfully, send it back to the client
+      res.json(dbUser);
+    })
+    .catch(function(err) {
+      // If an error occurs, send it back to the client
+      res.json(err);
+    });
+
+});
+
+app.get("/note/:id", function(req,res){
+    db.Article.find({_id:req.params.id}).populate("note")
+    .then(function(notes){
+        console.log(notes);
+        res.json(notes[0].note[0].body);
+    })
+})
 
 
 var PORT = process.env.PORT || 3000;

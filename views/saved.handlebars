@@ -5,19 +5,36 @@
             <div class="row">
                 <div class="col-lg-8 card-block">
                     <p class="card-text">{{this.summary}}</p>
-                    <a href="http://www.bbc.com{{this.link}}" target="_blank" class="card-link">Read more</a>
+                    <a href="http://www.nytimes.com{{this.link}}" target="_blank" class="card-link">Read more</a>
                 </div>
                 <div class="col-lg-4 align-self-end text-right">
                     <button class="btn btn-danger m-2 btn-remove" data-id="{{this._id}}">Remove</button>
-                    <button class="btn btn-success m-2 btn-view-notes" data-id="{{this._id}}">View Notes</button>
+                    <button type="button" class="btn btn-primary addNote"  data-toggle="modal" data-target="#exampleModal" data-id="{{this._id}}" >
+                    Add Note
+                    </button>
                 </div>
             </div>
         </div>
     {{/each}}
 </div>
 
-<div class="modal fade">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content"></div>
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <h2>Note:</h2>
+      <div class="modal-body">
+        <textarea id="text-area" type="text-area"rows="14" cols="50"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <span id="noteButton"></span>
+      </div>
     </div>
+  </div>
 </div>
